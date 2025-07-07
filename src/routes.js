@@ -1,14 +1,15 @@
 import { randomUUID } from "node:crypto";
-import { formatDateDisplay } from "./utils/format-date-display";
-import { title } from "process";
-import { create } from "domain";
-import { upgrade } from "undici-types";
-import { stringify } from "querystring";
+import { formatDateDisplay } from "./utils/format-date-display.js";
+import { buildRoutePath } from "./utils/build-route-path.js";
+import { Database } from "./database.js";
+import { create } from "node:domain";
+
+const database = new Database();
 
 export const routes = [
   {
     method: "POST",
-    path: "/tasks",
+    path: buildRoutePath("/tasks"),
     handler: (req, res) => {
       const { title, description } = req.body;
 
@@ -16,51 +17,67 @@ export const routes = [
         id: randomUUID(),
         title,
         description,
-        created_at: new Date().toISOString(),
-        update_at: new Date().toISOString(),
+        created_at: new Date(),
+        update_at: new Date(),
         completed_at: null,
       };
 
-    //   database.insert("tasks", task)
+      database.insert("tasks", task);
 
       return res.writeHead(201).end();
     },
   },
+
   {
     method: "GET",
-    path: "/tasks",
+    path: buildRoutePath("/tasks"),
+    handler: (req, res) => {
+      const { task } = req.query;
+
+      const taskList = database.select("tasks", task ? {
+        title: task,
+        description: task,
+        create_at: formatDateDisplay(tasks),
+        update_at: formatDateDisplay(tasks),
+        completed_at: formatDateDisplay(tasks),
+      } : null);
+
+      return res.end(JSON.stringify(taskList));
+    },
+  },
+
+  {
+    method: "PUT",
+    path: buildRoutePath("/tasks/:id"),
+    handler: (req, res) => {
+      const { id } = req.params;
+      const { title, description } = req.body;
+
+      database.update("tasks", id, {
+        title,
+        description,
+      });
+
+      return res.writeHead(204).end();
+    },
+  },
+
+  {
+    method: "DELETE",
+    path: buildRoutePath("/tasks/:id"),
     handler: (req, res) => {
       const { id } = req.params;
 
-      const taskFromDB = database.find("tasks", id);
+      database.delete("tasks", id);
 
-      const exibitionDisplayTask = {
-        id: taskFromDB.id,
-        title: taskFromDB.title,
-        discription: taskFromDB.description,
-        create_at: formatDateDisplay(new Date(taskFromDB.create_at)),
-        upgrade_at: formatDateDisplay(new Date(taskFromDB.uptade_at)),
-        completed_at: taskFromDB.completed_at
-          ? formatDateDisplay(new Date(taskFromDB.completed_at))
-          : null,
-      };
-
-      return res.end(JSON, stringify(exibitionDisplayTask));
+      return res.writeHead(204).end();
     },
   },
-  {
-    method: "PUT",
-    path: "/tasks/:id",
-    handler: (req, res) => {},
-  },
-  {
-    method: "DELETE",
-    path: "/tasks/:id",
-    handler: (req, res) => {},
-  },
-  {
-    method: "PATCH",
-    path: "/tasks/:id/complete",
-    handler: (req, res) => {},
-  },
 ];
+
+// Pesquisar sobre como funciona
+//   {
+//     method: "PATCH",
+//     path: buildRoutePath("/tasks/:id/complete"),
+//     handler: (req, res) => {},
+//   },
