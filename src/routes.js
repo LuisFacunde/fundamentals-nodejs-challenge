@@ -21,8 +21,10 @@ export const routes = [
         completed_at: null,
       };
 
+      
       database.insert("tasks", task);
-
+      
+      console.log("Nova task criada");
       return res.writeHead(201).end();
     },
   },
@@ -31,19 +33,28 @@ export const routes = [
     method: "GET",
     path: buildRoutePath("/tasks"),
     handler: (req, res) => {
-      const { task } = req.query;
+      const { search } = req.query;
 
       const taskList = database.select(
         "tasks",
-        task
-          ? {
-              title: task,
-              description: task,
-            }
-          : null
-      );
+        search ? {
+              title: search,
+              description: search,
+            }: null);
 
-      return res.end(JSON.stringify(taskList));
+      // Utilizando o método map para formatar as datas de cada tarefa
+      const formattedTasks = taskList.map((task) => { // Para cada tarefa, retorna um novo objeto com as datas formatadas
+        return {
+          ...task, // Copia todos os campos originais (id, title, description)
+          created_at: formatDateDisplay(new Date(task.created_at)),
+          update_at: formatDateDisplay(new Date(task.update_at)),
+          completed_at: task.completed_at // Trata o caso de 'completed_at', que pode ser nulo
+            ? formatDateDisplay(new Date(task.completed_at))
+            : null,
+        };
+      });
+      console.log("GET chamado para listar tarefas");
+      return res.end(JSON.stringify(formattedTasks)); // Envia a nova lista com as datas já formatadas
     },
   },
 
@@ -54,13 +65,19 @@ export const routes = [
       const { id } = req.params;
       const { title, description } = req.body;
 
-      console.log("PUT chamado para id:", req.params.id);
+      const [task] = database.select("tasks", { id });
+
+      if (!task) {
+        return res.writeHead(404).end(JSON.stringify({ message: "Task not found" }));
+      }
 
       database.update("tasks", id, {
         title,
         description,
         update_at: new Date(), // Atualiza a data de modificação
       });
+
+      console.log("PUT chamado para id:", req.params.id);
 
       return res.writeHead(204).end();
     },
@@ -72,6 +89,12 @@ export const routes = [
     handler: (req, res) => {
       const { id } = req.params;
 
+      const [task] = database.select("tasks", { id });
+
+      if (!task) {
+        return res.writeHead(404).end(JSON.stringify({ message: "Task not found" }));
+      }
+
       console.log("DELETE chamado para id:", req.params.id);
 
       database.delete("tasks", id);
@@ -79,9 +102,30 @@ export const routes = [
       return res.writeHead(204).end();
     },
   },
+
   {
     method: "PATCH",
     path: buildRoutePath("/tasks/:id/complete"),
-    handler: (req, res) => {},
+    handler: (req, res) => {
+      const { id } = req.params;
+
+      const [task] = database.select("tasks", { id });
+
+      if (!task) {
+        return res.writeHead(404).end(JSON.stringify({ message: "Task not found" }));
+      }
+
+      const isCompleted = !!task.completed_at;
+      const newCompletedState = isCompleted ? null : new Date();
+
+      database.update("tasks", id, {
+        completed_at: newCompletedState,
+        update_at: new Date(),
+      });
+
+      console.log("PATCH chamado para id:", req.params.id);
+
+      return res.writeHead(204).end();
+    },
   },
 ];
