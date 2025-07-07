@@ -2,7 +2,6 @@ import { randomUUID } from "node:crypto";
 import { formatDateDisplay } from "./utils/format-date-display.js";
 import { buildRoutePath } from "./utils/build-route-path.js";
 import { Database } from "./database.js";
-import { create } from "node:domain";
 
 const database = new Database();
 
@@ -34,13 +33,15 @@ export const routes = [
     handler: (req, res) => {
       const { task } = req.query;
 
-      const taskList = database.select("tasks", task ? {
-        title: task,
-        description: task,
-        create_at: formatDateDisplay(tasks),
-        update_at: formatDateDisplay(tasks),
-        completed_at: formatDateDisplay(tasks),
-      } : null);
+      const taskList = database.select(
+        "tasks",
+        task
+          ? {
+              title: task,
+              description: task,
+            }
+          : null
+      );
 
       return res.end(JSON.stringify(taskList));
     },
@@ -53,9 +54,12 @@ export const routes = [
       const { id } = req.params;
       const { title, description } = req.body;
 
+      console.log("PUT chamado para id:", req.params.id);
+
       database.update("tasks", id, {
         title,
         description,
+        update_at: new Date(), // Atualiza a data de modificação
       });
 
       return res.writeHead(204).end();
@@ -68,16 +72,16 @@ export const routes = [
     handler: (req, res) => {
       const { id } = req.params;
 
+      console.log("DELETE chamado para id:", req.params.id);
+
       database.delete("tasks", id);
 
       return res.writeHead(204).end();
     },
   },
+  {
+    method: "PATCH",
+    path: buildRoutePath("/tasks/:id/complete"),
+    handler: (req, res) => {},
+  },
 ];
-
-// Pesquisar sobre como funciona
-//   {
-//     method: "PATCH",
-//     path: buildRoutePath("/tasks/:id/complete"),
-//     handler: (req, res) => {},
-//   },

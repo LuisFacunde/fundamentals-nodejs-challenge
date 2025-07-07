@@ -15,7 +15,7 @@ export class Database {
       });
   }
 
-  persist() {
+  #persist() {
     fs.writeFile(databasePath, JSON.stringify(this.#database));
   }
 
@@ -40,26 +40,29 @@ export class Database {
       this.#database[table] = [task];
     }
 
-    this.persist();
+    this.#persist();
 
     return task;
   }
 
   update(table, id, data) {
+    if (!Array.isArray(this.#database[table])) return; // Verifica se dj.json existe
     const rowIndex = this.#database[table].findIndex((row) => row.id === id);
 
     if (rowIndex > -1) {
-      this.#database[table][rowIndex] = { id, ...data };
-      this.persist();
+      // this.#database[table][rowIndex] = { id, ...data };
+      this.#database[table][rowIndex] = { ...this.#database[table][rowIndex], ...data };
+      this.#persist();
     }
   }
 
   delete(table, id) {
+    if (!Array.isArray(this.#database[table])) return; // Verifica se dj.json existe
     const rowIndex = this.#database[table].findIndex((row) => row.id === id);
 
     if (rowIndex > -1) {
       this.#database[table].splice(rowIndex, 1);
-      this.persist();
+      this.#persist();
     }
   }
 }
