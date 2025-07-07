@@ -1,5 +1,5 @@
 import http from "node:http";
-import { routes } from "./routes";
+// import { routes } from "./routes";
 
 const server = http.createServer((req, res) => {
   const { method, url } = req;

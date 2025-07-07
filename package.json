@@ -1,0 +1,22 @@
+{
+  "name": "fundamentals-nodejs-challenge",
+  "version": "1.0.0",
+  "description": "Desenvolvimento de uma API que realiza um CRUD de tasks (tarefas).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node --watch src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuisFacunde/fundamentals-nodejs-challenge.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/LuisFacunde/fundamentals-nodejs-challenge/issues"
+  },
+  "homepage": "https://github.com/LuisFacunde/fundamentals-nodejs-challenge#readme"
+}
