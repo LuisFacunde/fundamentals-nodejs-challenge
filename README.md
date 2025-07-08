@@ -24,7 +24,7 @@ A aplicação permite criar, listar, atualizar, remover e marcar tarefas como co
 
 1. **Clone o repositório:**
    ```sh
-   git clone https://github.com/seu-usuario/fundamentals-nodejs-challenge.git
+   git clone https://github.com/LuisFacunde/fundamentals-nodejs-challenge.git
    cd fundamentals-nodejs-challenge
    ```
 
