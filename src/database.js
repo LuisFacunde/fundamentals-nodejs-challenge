@@ -11,7 +11,7 @@ export class Database {
         this.#database = JSON.parse(data);
       })
       .catch(() => {
-        this.persist();
+        this.#persist();
       });
   }
 
