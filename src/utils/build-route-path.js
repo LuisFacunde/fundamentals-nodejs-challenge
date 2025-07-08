@@ -5,7 +5,6 @@ export function buildRoutePath(path) {
     (_, key) => `(?<${key}>[^/\\?]+)`
   );
 
-  // Adiciona grupo nomeado para query string
   const pathRegex = new RegExp(`^${pathWithParams}(\\?(?<query>.*))?$`);
 
   return pathRegex;
