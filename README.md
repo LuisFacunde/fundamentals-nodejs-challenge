@@ -35,7 +35,7 @@ A aplicação permite criar, listar, atualizar, remover e marcar tarefas como co
 
 3. **Execute o servidor:**
    ```sh
-   node src/server.js
+   npm run dev
    ```
 
    O servidor irá rodar na porta `3333`.
