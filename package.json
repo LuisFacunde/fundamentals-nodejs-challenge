@@ -18,5 +18,9 @@
   "bugs": {
     "url": "https://github.com/LuisFacunde/fundamentals-nodejs-challenge/issues"
   },
-  "homepage": "https://github.com/LuisFacunde/fundamentals-nodejs-challenge#readme"
+  "homepage": "https://github.com/LuisFacunde/fundamentals-nodejs-challenge#readme",
+  "dependencies": {
+    "csv": "^6.3.11",
+    "csv-parse": "^5.6.0"
+  }
 }
